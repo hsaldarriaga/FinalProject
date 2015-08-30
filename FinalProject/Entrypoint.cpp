@@ -1,14 +1,13 @@
 #include <Windows.h>
-#include <string>
+#include "Scene.h"
 #include "resource.h"
-#include "Graphics.h"
 static TCHAR szWindowClass[] = L"win32app";
 static TCHAR szTitle[] = L"Sea Waves Experiment";
 static int WidthSize = 800;
 static int HeightSize = 600;
 
 Graphics* g;
-bool init = false;
+Scene* scene;
 int WINAPI WinMain(HINSTANCE hInstance,	HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -44,6 +43,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	g = new Graphics(hWnd, rec.right - rec.left, rec.bottom - rec.top);
 	if (!g->Initialize())
 		return 1;
+	scene = new Scene(g);
+	if (!scene->Initialize())
+	{
+		g->Release();
+		delete g;
+		delete scene;
+		return 1;
+	}
 	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));
 	while (WM_QUIT != msg.message)
@@ -53,10 +60,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		g->Ready(TRUE);
+		scene->Render();
 	}
-	g->Release();
-	delete g;
+	delete scene;
 	return (int)msg.wParam;
 }
 LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
