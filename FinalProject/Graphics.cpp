@@ -110,8 +110,9 @@ void Graphics::SetViewPort()
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
 	pDevContext->RSSetViewports(1, &vp);
-	IsReady = false;
+	IsReady = true;
 }
+
 
 HRESULT Graphics::SwitchMode()
 {
@@ -146,7 +147,7 @@ HRESULT Graphics::SwitchMode()
 	DXGI_MODE_DESC ds;
 	ds.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	ds.RefreshRate.Numerator = 1;
-	ds.RefreshRate.Denominator = 1;
+	ds.RefreshRate.Denominator = 60;
 	ds.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	ds.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	ds.Width = Width;
@@ -155,6 +156,9 @@ HRESULT Graphics::SwitchMode()
 	if (FAILED(hr))
 		return false;
 	hr = pSwapChain->ResizeBuffers(BufferCount, Width, Height, DXGI_FORMAT_UNKNOWN, 0);
+	if (FAILED(hr))
+		return false;
+	hr = SetRenderTargets();
 	SetViewPort();
 	return hr;
 }

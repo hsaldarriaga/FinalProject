@@ -51,6 +51,9 @@
     <ClCompile Include="ImageFactory.cpp">
       <Filter>Archivos de código fuente\Helpers</Filter>
     </ClCompile>
+    <ClCompile Include="Ctrl360.cpp">
+      <Filter>Archivos de código fuente</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\..\Desktop\icon.ico">
@@ -92,6 +95,12 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="WICHelpers.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctrl360.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

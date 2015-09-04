@@ -108,7 +108,7 @@ bool Scene::CreateBuffers()
 }
 bool Scene::LoadModels()
 {
-	Terrain = static_cast<TerrainMesh*>(Mfactory->Initialize(L"\\models\\ground.fbx", "Terrain"));
+	Terrain = static_cast<TerrainMesh*>(Mfactory->Initialize(L"\\models\\beach.fbx", "Terrain"));
 	if (!Terrain)
 		return false;
 	PX->pPxScene->addActor(*Terrain->actor);
@@ -117,10 +117,13 @@ bool Scene::LoadModels()
 bool Scene::SetParameters()
 {
 	Cmr = new Camera(PX);
-	Cmr->SetCamera(DirectX::XMFLOAT3A(1.0f, 5.0f, -2.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
-	Cmr->SetParameters(DirectX::XMConvertToRadians(120.0f), (float)G->Width / (float)G->Height, 0.2f, 30.0f);
-	LightDir = DirectX::XMLoadFloat3A(&DirectX::XMFLOAT3A(0.0f, 2.0f, -2.0f));
-	LightColor = DirectX::XMLoadFloat4A(&DirectX::XMFLOAT4A(0.8f, 0.8f, 0.8f, 1.0f));
+	Cmr->SetCamera(DirectX::XMFLOAT3A(1.0f, 5.0f, -1.0f), DirectX::XMFLOAT3(0.0f, 5.0f, 0.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
+	Cmr->SetParameters(DirectX::XMConvertToRadians(90.0f), (float)G->Width / (float)G->Height, 0.2f, 200.0f);
+	LightDir = DirectX::XMLoadFloat3A(&DirectX::XMFLOAT3A(-5.0f, 3.0f, 0.0f));
+	LightColor = DirectX::XMLoadFloat4A(&DirectX::XMFLOAT4A(0.4f, 0.4f, 0.4f, 1.0f));
+
+	Joystick = new Ctrl360(Cmr);
+	Joystick->Init();
 	return true;
 }
 
@@ -128,10 +131,6 @@ void Scene::RenderOnChange()
 {
 	ID3D11DeviceContext* d = G->pDevContext;
 	D3D11_MAPPED_SUBRESOURCE sub;
-	d->Map(cbEye, 0, D3D11_MAP_WRITE_DISCARD, 0, &sub);
-	EYE* eye = reinterpret_cast<EYE*>(sub.pData);
-	eye->eye = Cmr->Eye;
-	d->Unmap(cbEye, 0);
 	d->Map(cbLight, 0, D3D11_MAP_WRITE_DISCARD, 0, &sub);
 	LIGHT* buflight = reinterpret_cast<LIGHT*>(sub.pData);
 	buflight->color = LightColor;
@@ -144,7 +143,11 @@ void Scene::Render()
 {
 	if (ThereAreChanges)
 		RenderOnChange();
+	Joystick->CaptureUserInteractions();
+	PX->pPxScene->simulate(1 / 60 * 1000);
+	PX->pPxScene->fetchResults(true);
 	ID3D11DeviceContext* d = G->pDevContext;
+	Cmr->Update();
 	Cmr->setView(); Cmr->SetProjection();
 	D3D11_MAPPED_SUBRESOURCE sub;
 	d->Map(cbMatrices, 0, D3D11_MAP_WRITE_DISCARD, 0, &sub);
@@ -184,6 +187,8 @@ void Scene::Render()
 
 Scene::~Scene()
 {
+	if (Joystick)
+		delete Joystick;
 	if (Cmr)
 		delete Cmr;
 	if (Terrain)

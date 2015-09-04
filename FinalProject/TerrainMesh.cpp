@@ -61,6 +61,7 @@ bool TerrainMesh::Initialize(FbxNode* node)
 		FbxVector4 T = l.GetT();
 		t.q = physx::PxQuat(Q.GetAt(0), Q.GetAt(1), Q.GetAt(2), Q.GetAt(3));
 		t.p = physx::PxVec3((float)T.mData[0], (float)T.mData[1], (float)T.mData[2]);
+		
 		actor = PX->pPhysics->createRigidStatic(t);
 		FbxDouble3 vec = lMaterial->Ambient.Get();
 		Ka = DirectX::XMLoadFloat4(new DirectX::XMFLOAT4(static_cast<FLOAT>(vec.mData[0]), static_cast<FLOAT>(vec.mData[1]), static_cast<FLOAT>(vec.mData[2]), 1.0f));
@@ -95,8 +96,8 @@ bool TerrainMesh::AddPhysics()
 	physx::PxDefaultMemoryOutputStream writeBuffer;
 #ifdef _DEBUG
 	// mesh should be validated before cooked without the mesh cleaning
-	bool res = PX->pCooking->validateTriangleMesh(desc);
-	PX_ASSERT(res);
+	//bool res = PX->pCooking->validateTriangleMesh(desc);
+	//PX_ASSERT(res);
 #endif
 	if (!PX->pCooking->cookTriangleMesh(desc, writeBuffer))
 		return false;

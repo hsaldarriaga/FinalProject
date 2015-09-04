@@ -15,5 +15,7 @@ private:
 	UINT getbpp(IWICImagingFactory* factory, REFGUID guid);
 	ID3D11Device* pDevice;
 	IWICImagingFactory* pFactory = NULL;
+
+
 };
 

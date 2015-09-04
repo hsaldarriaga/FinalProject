@@ -49,7 +49,7 @@
     <LinkIncremental>false</LinkIncremental>
     <ExecutablePath>C:\Program Files\Autodesk\FBX\FBX SDK\2015.1\lib\vs2013\x86\release;E:\PhysX-3.3\PhysXSDK\Bin\vc12win32;$(ExecutablePath)</ExecutablePath>
     <IncludePath>C:\Program Files\Autodesk\FBX\FBX SDK\2015.1\include;E:\PhysX-3.3\PhysXSDK\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\Autodesk\FBX\FBX SDK\2015.1\lib\vs2013\x86\debug;E:\PhysX-3.3\PhysXSDK\Lib\vc12win32;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files\Autodesk\FBX\FBX SDK\2015.1\lib\vs2013\x86\release;E:\PhysX-3.3\PhysXSDK\Lib\vc12win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -85,6 +85,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Ctrl360.cpp" />
     <ClCompile Include="Entrypoint.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="ImageFactory.cpp" />
@@ -100,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Ctrl360.h" />
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="ImageFactory.h" />
@@ -110,6 +112,7 @@
     <ClInclude Include="FileLoader.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="TerrainMesh.h" />
+    <ClInclude Include="WICHelpers.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

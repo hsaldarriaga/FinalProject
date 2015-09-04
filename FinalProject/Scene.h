@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Graphics.h"
-#include "Camera.h"
+#include "Ctrl360.h"
 #include "MeshFactory.h"
 #include "TerrainMesh.h"
 
@@ -37,7 +37,7 @@ private:
 	MeshFactory* Mfactory = NULL;
 	TerrainMesh* Terrain = NULL;
 	Camera* Cmr = NULL;
-	
+	Ctrl360* Joystick = NULL;
 
 	CComPtr<ID3D11PixelShader> PShader;
 	CComPtr<ID3D11VertexShader> VShader;

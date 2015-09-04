@@ -1,4 +1,5 @@
 #include "ImageFactory.h"
+#include "WICHelpers.h"
 
 ImageFactory::ImageFactory(ID3D11Device* device)
 {
@@ -53,6 +54,30 @@ HRESULT ImageFactory::createTexture(IWICBitmapFrameDecode* pFrame, ID3D11ShaderR
 	if (FAILED(hr))
 		return hr;
 	desc.Format = getDXGIFormat(WICformat);
+	UINT bpp = 0;
+	WICPixelFormatGUID convertGUID;
+	bool otherformat = false;
+	if (desc.Format == DXGI_FORMAT_UNKNOWN)
+	{
+		for (size_t i = 0; i < 41; ++i)
+		{
+			if (memcmp(&g_WICConvert[i].source, &WICformat, sizeof(WICPixelFormatGUID)) == 0)
+			{
+				memcpy(&convertGUID, &g_WICConvert[i].target, sizeof(WICPixelFormatGUID));
+
+				desc.Format = getDXGIFormat(g_WICConvert[i].target);
+				bpp = getbpp(pFactory, convertGUID);
+				otherformat = true;
+				break;
+			}
+		}
+		if (desc.Format == DXGI_FORMAT_UNKNOWN)
+			return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+	}
+	else {
+		bpp = getbpp(pFactory, WICformat);
+		
+	}
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
@@ -61,7 +86,6 @@ HRESULT ImageFactory::createTexture(IWICBitmapFrameDecode* pFrame, ID3D11ShaderR
 	desc.MiscFlags = 0;
 	D3D11_SUBRESOURCE_DATA data;
 	ZeroMemory(&data, sizeof(data));
-	UINT bpp = getbpp(pFactory, WICformat);
 	if (bpp == 0)
 		return E_FAIL;
 	size_t rowPitch = (desc.Width * bpp + 7) / 8;
@@ -69,7 +93,31 @@ HRESULT ImageFactory::createTexture(IWICBitmapFrameDecode* pFrame, ID3D11ShaderR
 	data.SysMemPitch = static_cast<UINT>(rowPitch);
 	data.SysMemSlicePitch = static_cast<UINT>(imageSize);
 	BYTE *imagedata = new BYTE[imageSize];
-	hr = pFrame->CopyPixels(0, data.SysMemPitch, data.SysMemSlicePitch, imagedata);
+	if (otherformat)
+	{
+		IWICImagingFactory* pWIC = pFactory;
+		if (!pWIC)
+			return E_NOINTERFACE;
+
+		IWICFormatConverter* FC;
+		hr = pWIC->CreateFormatConverter(&FC);
+		if (FAILED(hr)){
+			FC->Release(); return hr;
+		}
+		hr = FC->Initialize(pFrame, convertGUID, WICBitmapDitherTypeErrorDiffusion, 0, 0, WICBitmapPaletteTypeCustom);
+		if (FAILED(hr)){
+			FC->Release(); return hr;
+		}
+		hr = FC->CopyPixels(0, data.SysMemPitch, data.SysMemSlicePitch, imagedata);
+		if (FAILED(hr)){
+			FC->Release(); return hr;
+		}
+		FC->Release();
+	} 
+	else 
+	{
+		hr = pFrame->CopyPixels(0, data.SysMemPitch, data.SysMemSlicePitch, imagedata);
+	}
 	if (FAILED(hr))
 		return hr;
 	data.pSysMem = imagedata;
@@ -126,6 +174,7 @@ DXGI_FORMAT ImageFactory::getDXGIFormat(WICPixelFormatGUID WICFormat)
 		return DXGI_FORMAT_R32G32B32_FLOAT;
 	return DXGI_FORMAT_UNKNOWN;
 }
+
 UINT ImageFactory::getbpp(IWICImagingFactory* factory, REFGUID guid)
 {
 	IWICComponentInfo* cinfo = NULL;

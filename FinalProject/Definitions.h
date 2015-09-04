@@ -61,3 +61,4 @@ __declspec(align(16)) struct EYE
 {
 	DirectX::XMVECTOR eye;
 };
+
