@@ -1,5 +1,6 @@
 #include "MeshFactory.h"
 #include "TerrainMesh.h"
+#include "SunMesh.h"
 #include <PathCch.h>
 
 #pragma comment(lib, "Pathcch.lib")
@@ -50,6 +51,17 @@ IMesh* MeshFactory::Initialize(LPWSTR filename, LPCSTR type)
 			}
 			pScene->Destroy();
 			return tm;
+		}
+		else if (type == "Sun") {
+			SunMesh* sn = new SunMesh(G, Physxsdk, join);
+			if (!sn->Initialize(lRootNode))
+			{
+				delete sn;
+				pScene->Destroy();
+				return NULL;
+			}
+			pScene->Destroy();
+			return sn;
 		}
 		else
 		{

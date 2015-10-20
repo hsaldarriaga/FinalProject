@@ -9,7 +9,9 @@ class TerrainMesh : public IMesh
 public:
 	TerrainMesh(Graphics* g, Physx* px, LPCWSTR location);
 	bool Initialize(FbxNode*);
-	UINT getIndexCount();
+	int getIndexesCount();
+	DirectX::XMMATRIX* getMatrix();
+#pragma region Allocator
 	void* operator new(size_t i)
 	{
 		return _mm_malloc(i, 16);
@@ -19,6 +21,7 @@ public:
 	{
 		_mm_free(p);
 	}
+#pragma endregion
 	~TerrainMesh();
 private:
 	HRESULT Prepare();
@@ -28,11 +31,7 @@ private:
 public:
 	
 	CComPtr<ID3D11ShaderResourceView> resource;
-	CComPtr<ID3D11Buffer> VertexBuffer;
-	CComPtr<ID3D11Buffer> IndexBuffer;
 	DirectX::XMVECTOR Ka; //ambient
-	DirectX::XMVECTOR Ks; //specular
 	DirectX::XMVECTOR Kd;
-	float shininess;
 };
 

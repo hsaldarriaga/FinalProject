@@ -46,8 +46,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	scene = new Scene(g);
 	if (!scene->Initialize())
 	{
-		g->Release();
-		delete g;
 		delete scene;
 		return 1;
 	}
@@ -69,6 +67,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (Msg)
 	{
+	case WM_SIZE:
+		g->SizeEvent();
+		break;
+
 	case WM_SYSCOMMAND:
 		if (lParam == VK_RETURN)
 		{

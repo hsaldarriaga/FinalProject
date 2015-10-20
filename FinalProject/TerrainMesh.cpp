@@ -3,6 +3,7 @@
 
 TerrainMesh::TerrainMesh(Graphics* g, Physx* px, LPCWSTR location) : IMesh(g, px, location)
 {
+	stride = sizeof(DataLayout);
 }
 
 bool TerrainMesh::Initialize(FbxNode* node)
@@ -56,20 +57,20 @@ bool TerrainMesh::Initialize(FbxNode* node)
 		if (FAILED(hr))
 			return false;
 		FbxAMatrix l = lChild->EvaluateLocalTransform();
+		Scale.x = (float)l.Get(0, 0); Scale.y = (float)l.Get(1, 1); Scale.z = (float)l.Get(2, 2);
 		physx::PxTransform t = physx::PxTransform(physx::PxIdentity);
 		FbxQuaternion Q = l.GetQ();
 		FbxVector4 T = l.GetT();
-		t.q = physx::PxQuat(Q.GetAt(0), Q.GetAt(1), Q.GetAt(2), Q.GetAt(3));
+		t.q = physx::PxQuat((float)Q.GetAt(0), (float)Q.GetAt(1), (float)Q.GetAt(2), (float)Q.GetAt(3));
 		t.p = physx::PxVec3((float)T.mData[0], (float)T.mData[1], (float)T.mData[2]);
-		
 		actor = PX->pPhysics->createRigidStatic(t);
 		FbxDouble3 vec = lMaterial->Ambient.Get();
 		Ka = DirectX::XMLoadFloat4(new DirectX::XMFLOAT4(static_cast<FLOAT>(vec.mData[0]), static_cast<FLOAT>(vec.mData[1]), static_cast<FLOAT>(vec.mData[2]), 1.0f));
-		vec = lMaterial->Specular.Get();
-		Ks = DirectX::XMLoadFloat4(new DirectX::XMFLOAT4(static_cast<FLOAT>(vec.mData[0]), static_cast<FLOAT>(vec.mData[1]), static_cast<FLOAT>(vec.mData[2]), 1.0f));
+		//vec = lMaterial->Specular.Get();
+		//Ks = DirectX::XMLoadFloat4(new DirectX::XMFLOAT4(static_cast<FLOAT>(vec.mData[0]), static_cast<FLOAT>(vec.mData[1]), static_cast<FLOAT>(vec.mData[2]), 1.0f));
 		vec = lMaterial->Diffuse.Get();
 		Kd = DirectX::XMLoadFloat4(new DirectX::XMFLOAT4(static_cast<FLOAT>(vec.mData[0]), static_cast<FLOAT>(vec.mData[1]), static_cast<FLOAT>(vec.mData[2]), 1.0f));
-		shininess = (float)lMaterial->Shininess.Get();
+		//shininess = (float)lMaterial->Shininess.Get();
 		if (!AddPhysics())
 			return false;
 		if (FAILED(Prepare()))
@@ -79,31 +80,28 @@ bool TerrainMesh::Initialize(FbxNode* node)
 	return false;
 }
 
-UINT TerrainMesh::getIndexCount()
-{
-	return pIndexforD3D.size();
-}
-
 bool TerrainMesh::AddPhysics()
 {
 	physx::PxTriangleMeshDesc desc;
 	desc.points.count = pDataforD3D.size();
 	desc.points.data = pDataforD3D.data();
 	desc.points.stride = sizeof(DataLayout);
-	desc.triangles.count = pIndexforD3D.size();
+	desc.triangles.count = pIndexforD3D.size()/3;
 	desc.triangles.data = pIndexforD3D.data();
 	desc.triangles.stride = sizeof(UINT)*3;
 	physx::PxDefaultMemoryOutputStream writeBuffer;
 #ifdef _DEBUG
-	// mesh should be validated before cooked without the mesh cleaning
-	//bool res = PX->pCooking->validateTriangleMesh(desc);
-	//PX_ASSERT(res);
+	//mesh should be validated before cooked without the mesh cleaning
+	bool res = PX->pCooking->validateTriangleMesh(desc);
+	PX_ASSERT(res);
 #endif
 	if (!PX->pCooking->cookTriangleMesh(desc, writeBuffer))
 		return false;
 	physx::PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
 	physx::PxTriangleMesh* trimesh = PX->pPhysics->createTriangleMesh(readBuffer);
-	physx::PxTriangleMeshGeometry geometry = physx::PxTriangleMeshGeometry(trimesh);
+	physx::PxMeshScale sc = physx::PxMeshScale();
+	sc.scale.x = Scale.x; sc.scale.y = Scale.y; sc.scale.z = Scale.z;
+	physx::PxTriangleMeshGeometry geometry = physx::PxTriangleMeshGeometry(trimesh, sc);
 	physx::PxMaterial* material = PX->pPhysics->createMaterial(0.f, 0.5f, 1.0f);
 	((physx::PxRigidStatic*)actor)->createShape(geometry, *material);
 	return true;
@@ -137,6 +135,24 @@ HRESULT TerrainMesh::Prepare()
 	return hr;
 }
 
+inline int TerrainMesh::getIndexesCount()
+{
+	return pIndexforD3D.size();
+}
+DirectX::XMMATRIX* TerrainMesh::getMatrix()
+{
+	if (actor->isRigidActor())
+	{
+		physx::PxRigidActor* rigid = (physx::PxRigidActor*)actor;
+		physx::PxMat44 m = physx::PxMat44(rigid->getGlobalPose());
+		m.column0.x = Scale.x;
+		m.column1.y = Scale.y;
+		m.column2.z = Scale.z;
+		DirectX::XMMATRIX* dm = &DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(&m));
+		return dm;
+	}
+	return NULL;
+}
 TerrainMesh::~TerrainMesh()
 {
 	if (actor)

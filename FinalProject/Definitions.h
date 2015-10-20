@@ -2,6 +2,7 @@
 
 #include <DirectXMath.h>
 #include "Physx.h"
+#include <fbxsdk.h>
 
 __declspec(align(16)) struct DataLayout {
 	DirectX::XMFLOAT3 Vertice;
@@ -40,7 +41,14 @@ static DirectX::XMVECTOR ToXmV(FbxDouble3& pSrc)
 	return DirectX::XMLoadFloat4(new DirectX::XMFLOAT4(static_cast<FLOAT>(pSrc.mData[0]), static_cast<FLOAT>(pSrc.mData[1]), static_cast<FLOAT>(pSrc.mData[2]), 1.0f));
 }
 
-__declspec(align(16)) struct VS_CONSTANT
+__declspec(align(16)) struct WORLD_VIEW_PROJ_BUFFER
+{
+	DirectX::XMMATRIX World;
+	DirectX::XMMATRIX View;
+	DirectX::XMMATRIX Proj;
+};
+
+__declspec(align(16)) struct WORLD_VIEWxPROJ_BUFFER
 {
 	DirectX::XMMATRIX World;
 	DirectX::XMMATRIX ViewProj;
@@ -48,17 +56,46 @@ __declspec(align(16)) struct VS_CONSTANT
 __declspec(align(16)) struct MATERIAL_LIGHT
 {
 	DirectX::XMVECTOR Ka; //ambient
-	DirectX::XMVECTOR Ks; //specular
 	DirectX::XMVECTOR Kd; //diffuse
-	float shininess; // how large specular lights are
+};
+__declspec(align(16)) struct LIGHT_VIEW_PROJ_BUFFER
+{
+	DirectX::XMMATRIX LightView;
+	DirectX::XMMATRIX LightProj;
+	DirectX::XMVECTOR LightPos;
 };
 __declspec(align(16)) struct LIGHT
 {
 	DirectX::XMVECTOR color;
 	DirectX::XMVECTOR dir;
 };
+__declspec(align(16)) struct LIGHTDIR_EYEDIR
+{
+	DirectX::XMVECTOR light_dir;
+	DirectX::XMVECTOR eye_dir;
+};
 __declspec(align(16)) struct EYE
 {
 	DirectX::XMVECTOR eye;
 };
-
+__declspec(align(16)) struct VERTEXENTRY
+{
+	DirectX::XMFLOAT3 position;
+	DirectX::XMFLOAT2 textureuv;
+	VERTEXENTRY(float posx, float posy, float posz, float texu, float texv)
+	{
+		position = DirectX::XMFLOAT3A(posx, posy, posz);
+		textureuv = DirectX::XMFLOAT2A(texu, texv);
+	}
+};
+__declspec(align(16)) struct CONSTANTFLOAT
+{
+	float value;
+	float padd1 = 0;
+	float padd2 = 0;
+	float padd3 = 0;
+	CONSTANTFLOAT(float value)
+	{
+		this->value = value;
+	}
+};

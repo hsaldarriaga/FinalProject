@@ -8,6 +8,7 @@ Graphics::Graphics(HWND hWnd, int Width, int Height)
 	this->Height = Height;
 }
 
+const float Graphics::color[4] = { 0.3294f, 0.4627f, 0.7490f, 1.0f };
 
 bool Graphics::Initialize()  
 {
@@ -35,7 +36,7 @@ HRESULT Graphics::CreateDeviceAndSwapChain()
 	sd.SampleDesc.Count = 8;
 	sd.SampleDesc.Quality = 16;
 	sd.Windowed = TRUE;
-	//sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 	D3D_FEATURE_LEVEL FeatureLevels[] = { D3D_FEATURE_LEVEL_11_0};
 	D3D_FEATURE_LEVEL outLevel;
@@ -54,6 +55,7 @@ HRESULT Graphics::CreateDeviceAndSwapChain()
 		&pDevice,
 		&outLevel,
 		&pDevContext);
+	if (FAILED(hr)) { return hr; }
 	CComPtr<IDXGIDevice> pDXGIDevice;
 	hr = pDevice->QueryInterface(IID_PPV_ARGS(&pDXGIDevice));
 	if (FAILED(hr)) { return hr; }
@@ -64,7 +66,7 @@ HRESULT Graphics::CreateDeviceAndSwapChain()
 	pDXGIAdapter->GetParent(IID_PPV_ARGS(&pIDXGIFactory));
 	if (FAILED(hr)) { return hr; }
 	hr = pIDXGIFactory->CreateSwapChain(pDevice, &sd, &pSwapChain);
-	pIDXGIFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_WINDOW_CHANGES);
+	pIDXGIFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
 	return hr;
 }
 
@@ -85,7 +87,6 @@ HRESULT Graphics::SetRenderTargets()
 	ds.SampleDesc.Count = 8;
 	ds.SampleDesc.Quality = 16;
 	ds.Usage = D3D11_USAGE_DEFAULT;
-
 	hr = pDevice->CreateTexture2D(&ds, NULL, &DepthBuffer);
 	if (FAILED(hr))
 		return hr;
@@ -102,7 +103,6 @@ HRESULT Graphics::SetRenderTargets()
 
 void Graphics::SetViewPort()
 {
-	D3D11_VIEWPORT vp;
 	vp.Width = (float)this->Width;
 	vp.Height = (float)this->Height;
 	vp.MinDepth = 0.0f;
@@ -110,7 +110,6 @@ void Graphics::SetViewPort()
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
 	pDevContext->RSSetViewports(1, &vp);
-	IsReady = true;
 }
 
 
@@ -125,12 +124,6 @@ HRESULT Graphics::SwitchMode()
 	pRenderTargetView.Release();
 	pDepthStencilView.Release();
 	int BufferCount = 1;
-	if (IsFullScreenMode)
-		hr = pSwapChain->SetFullscreenState(FALSE, NULL);
-	else
-		hr = pSwapChain->SetFullscreenState(TRUE, NULL);
-	if (FAILED(hr))
-		return false;
 	if (IsFullScreenMode) 
 	{
 		RECT screen = { 0, 0, 800, 600 };
@@ -144,23 +137,48 @@ HRESULT Graphics::SwitchMode()
 		Height = 900;
 		BufferCount = 3;
 	}
-	DXGI_MODE_DESC ds;
+	DXGI_MODE_DESC ds, dmatch;
+	CComPtr<IDXGIOutput> output;
+	pSwapChain->GetContainingOutput(&output.p);
 	ds.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	ds.RefreshRate.Numerator = 1;
-	ds.RefreshRate.Denominator = 60;
+	ds.RefreshRate.Numerator = 0;
+	ds.RefreshRate.Denominator = 0;
 	ds.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	ds.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	ds.Width = Width;
 	ds.Height = Height;
-	hr = pSwapChain->ResizeTarget(&ds);
-	if (FAILED(hr))
-		return false;
-	hr = pSwapChain->ResizeBuffers(BufferCount, Width, Height, DXGI_FORMAT_UNKNOWN, 0);
+	if (IsFullScreenMode){
+		hr = pSwapChain->SetFullscreenState(FALSE, NULL);
+		if (FAILED(hr))
+			return false;
+		hr = pSwapChain->ResizeTarget(&ds);
+		if (FAILED(hr))
+			return false;
+		hr = pSwapChain->ResizeBuffers(BufferCount, Width, Height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);		
+	}
+	else
+	{
+		hr = pSwapChain->SetFullscreenState(TRUE, NULL);
+		if (FAILED(hr))
+			return false;
+		hr = output->FindClosestMatchingMode(&ds, &dmatch, pDevice);
+		if (FAILED(hr))
+			return false;
+		hr = pSwapChain->ResizeTarget(&dmatch);
+		if (FAILED(hr))
+			return false;
+		hr = pSwapChain->ResizeBuffers(BufferCount, dmatch.Width, dmatch.Height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+	}
 	if (FAILED(hr))
 		return false;
 	hr = SetRenderTargets();
 	SetViewPort();
 	return hr;
+}
+
+void Graphics::SizeEvent()
+{
+
 }
 
 void Graphics::Release() 

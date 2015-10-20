@@ -25,13 +25,19 @@
     <Filter Include="Models">
       <UniqueIdentifier>{b7c26098-c27e-49e5-b677-0042ec778aa0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de código fuente\Components\MeshTypes">
+      <UniqueIdentifier>{3a4a131e-d166-447d-bf85-7d4abbcd2fff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de código fuente\Components\Fundamental">
+      <UniqueIdentifier>{875559c6-dfd1-4342-b7e0-f7f65cdc4dc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\OceanShaders">
+      <UniqueIdentifier>{b1b0bb46-51d3-45c4-8bfb-fffc1e234fb5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entrypoint.cpp">
       <Filter>Archivos de código fuente</Filter>
-    </ClCompile>
-    <ClCompile Include="Physx.cpp">
-      <Filter>Archivos de código fuente\Components</Filter>
     </ClCompile>
     <ClCompile Include="FileLoader.cpp">
       <Filter>Archivos de código fuente\Helpers</Filter>
@@ -39,22 +45,46 @@
     <ClCompile Include="MeshFactory.cpp">
       <Filter>Archivos de código fuente\Helpers</Filter>
     </ClCompile>
-    <ClCompile Include="TerrainMesh.cpp">
-      <Filter>Archivos de código fuente\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Archivos de código fuente\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics.cpp">
-      <Filter>Archivos de código fuente\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Archivos de código fuente</Filter>
-    </ClCompile>
     <ClCompile Include="ImageFactory.cpp">
       <Filter>Archivos de código fuente\Helpers</Filter>
     </ClCompile>
     <ClCompile Include="Ctrl360.cpp">
+      <Filter>Archivos de código fuente</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainMesh.cpp">
+      <Filter>Archivos de código fuente\Components\MeshTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Archivos de código fuente\Components\Fundamental</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics.cpp">
+      <Filter>Archivos de código fuente\Components\Fundamental</Filter>
+    </ClCompile>
+    <ClCompile Include="Physx.cpp">
+      <Filter>Archivos de código fuente\Components\Fundamental</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowMapping.cpp">
+      <Filter>Archivos de código fuente\Components\Fundamental</Filter>
+    </ClCompile>
+    <ClCompile Include="SunMesh.cpp">
+      <Filter>Archivos de código fuente\Components\MeshTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="ToTexture.cpp">
+      <Filter>Archivos de código fuente\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="MotionBlurRender.cpp">
+      <Filter>Archivos de código fuente\Components\Fundamental</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Archivos de código fuente</Filter>
+    </ClCompile>
+    <ClCompile Include="CSFFT\fft_512x512_c2c.cpp">
+      <Filter>Archivos de código fuente\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="ocean_simulator.cpp">
+      <Filter>Archivos de código fuente</Filter>
+    </ClCompile>
+    <ClCompile Include="Ocean.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
   </ItemGroup>
@@ -109,6 +139,27 @@
     <ClInclude Include="Ctrl360.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="ShadowMapping.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="SunMesh.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="ToTexture.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="MotionBlurRender.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="CSFFT\fft_512x512.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="ocean_simulator.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Ocean.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -122,10 +173,55 @@
     <FxCompile Include="VertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="ShadowVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SunVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SunPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="HorizontalBlurVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="HorizontalVerticalBlurPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="VerticalBlurVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SimpleVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SimplePixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="OceanVertexShader.hlsl">
+      <Filter>Shaders\OceanShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="OceanPixelShader.hlsl">
+      <Filter>Shaders\OceanShaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="models\beach.fbx">
       <Filter>Models</Filter>
+    </None>
+    <None Include="CSFFT\fft_512x512_c2c.hlsl">
+      <Filter>Shaders\OceanShaders</Filter>
+    </None>
+    <None Include="ocean_shading.hlsl">
+      <Filter>Shaders\OceanShaders</Filter>
+    </None>
+    <None Include="ocean_simulator_cs.hlsl">
+      <Filter>Shaders\OceanShaders</Filter>
+    </None>
+    <None Include="ocean_simulator_vs_ps.hlsl">
+      <Filter>Shaders\OceanShaders</Filter>
     </None>
   </ItemGroup>
 </Project>

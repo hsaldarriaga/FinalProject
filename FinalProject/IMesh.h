@@ -12,17 +12,8 @@ class IMesh
 public:
 	IMesh(Graphics* g, Physx* px, LPCWSTR location) { this->G = g; this->PX = px; this->location = location;  }
 	virtual bool Initialize(FbxNode*) = 0;
-	DirectX::XMMATRIX* getMatrix()
-	{
-		if (actor->isRigidActor())
-		{
-			physx::PxRigidActor* rigid = (physx::PxRigidActor*)actor;
-			physx::PxMat44 m = physx::PxMat44(rigid->getGlobalPose());
-			DirectX::XMMATRIX* dm = &DirectX::XMLoadFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(&m));
-			return dm;
-		}
-		return NULL;
-	}
+	virtual int getIndexesCount() = 0;
+	virtual DirectX::XMMATRIX* getMatrix() = 0;
 	~IMesh()
 	{
 		delete[] location;
@@ -35,5 +26,8 @@ protected:
 public:
 	physx::PxActor* actor = NULL;
 	UINT stride = 0, offset = 0;
+	physx::PxVec3 Scale;
+	CComPtr<ID3D11Buffer> VertexBuffer;
+	CComPtr<ID3D11Buffer> IndexBuffer;
 };
 

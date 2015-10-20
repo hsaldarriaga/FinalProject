@@ -14,17 +14,20 @@ public:
 	void Release();
 	void Ready(bool);
 	inline bool isReady() { return IsReady; };
+	void SetViewPort();
+	void SizeEvent();
 	~Graphics();
 private:
 
 	HRESULT CreateDeviceAndSwapChain();
 	HRESULT SetRenderTargets();
-	void SetViewPort();
 	HWND hWnd;
 	bool IsReady = false;
 public:
+	int BufferCount = 1;
 	int Width, Height;
-
+	static const float color[4]; 
+	D3D11_VIEWPORT vp;
 	CComPtr<IDXGISwapChain> pSwapChain;
 	CComPtr<ID3D11Device> pDevice;
 	CComPtr<ID3D11DeviceContext> pDevContext;

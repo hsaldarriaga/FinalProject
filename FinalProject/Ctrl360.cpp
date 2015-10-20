@@ -47,7 +47,10 @@ void Ctrl360::CaptureUserInteractions()
 		//Button actions
 		if (state.dwPacketNumber != oldstate.dwPacketNumber && state.Gamepad.wButtons != 0)
 		{
-			
+			if (state.Gamepad.wButtons == XINPUT_GAMEPAD_A)
+			{
+				Cmr->Jump();
+			}
 		}
 		//Analog actions
 		ManageThumbs(&state);
@@ -74,6 +77,10 @@ void Ctrl360::ManageThumbs(XINPUT_STATE* state)
 		magnitude -= LEFT_THUMB_DEADZONE;
 		LnormalizedMagnitude = magnitude / (32767 - LEFT_THUMB_DEADZONE);
 		Cmr->MovePosition(normalizedLX, normalizedLY, LnormalizedMagnitude);
+	}
+	else 
+	{
+		Cmr->MoveIdle();
 	}
 	//right thumb stick
 	X = state->Gamepad.sThumbRX;
