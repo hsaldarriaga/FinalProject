@@ -26,7 +26,7 @@ struct VS_OUT
 	float3 normal : NORMAL0;
 	float vDepth : TEXCOORD2;
 	float4 LightViewProj : TEXCOORD3;
-	//float3 LightPos : TEXCOORD4;
+	//float LightPos : TEXCOORD4;
 };
 
 VS_OUT main(VS_IN entry)
@@ -37,8 +37,7 @@ VS_OUT main(VS_IN entry)
 	retu.normal = normalize(mul(entry.normal,(float3x3)World));
 	//retu.Wpos = mul(float4(entry.pos, 1.0f), World);
 	retu.uvcoord = entry.uvcoor;
-	retu.vDepth = mul(mul(float4(entry.pos, 1.0f), World), View).z;
+	retu.vDepth = mul(mul(float4(entry.pos, 1.0f), World), LightView).z;
 	retu.LightViewProj = mul(mul(mul(float4(entry.pos, 1.0f), World), LightView), LightProj);
-	//retu.LightPos = normalize(LightPos.xyz - WorldPos.xyz);
 	return retu;
 }

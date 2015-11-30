@@ -11,6 +11,7 @@ public:
 	bool Initialize(FbxNode*);
 	int getIndexesCount();
 	DirectX::XMMATRIX* getMatrix();
+	ID3D11ShaderResourceView* getHeightMap();
 #pragma region Allocator
 	void* operator new(size_t i)
 	{
@@ -31,7 +32,9 @@ private:
 public:
 	
 	CComPtr<ID3D11ShaderResourceView> resource;
+	CComPtr<ID3D11ShaderResourceView> HeightMap;
 	DirectX::XMVECTOR Ka; //ambient
 	DirectX::XMVECTOR Kd;
+	DirectX::XMMATRIX World;
 };
 

@@ -4,6 +4,8 @@
 #include "Ctrl360.h"
 #include "MeshFactory.h"
 #include "TerrainMesh.h"
+#include "CompoundMesh.h"
+#include "SimpleMesh.h"
 #include "SunMesh.h"
 #include "ShadowMapping.h"
 #include "MotionBlurRender.h"
@@ -35,18 +37,20 @@ private:
 	bool LoadModels();
 	bool SetParameters();
 
-	bool ThereAreChanges = true;
+	bool ThereAreChanges;
 
 	Graphics* G;
-	Physx* PX = NULL;
-	MeshFactory* Mfactory = NULL;
-	TerrainMesh* Terrain = NULL;
-	SunMesh* Sun = NULL;
-	Camera* Cmr = NULL;
-	Ctrl360* Joystick = NULL;
-	ShadowMapping* Shadows = NULL;
-	MotionBlurRender* MotionBlur = NULL;
-	Ocean* ocean = NULL;
+	Physx* PX;
+	MeshFactory* Mfactory;
+	CompoundMesh* Tree;
+	TerrainMesh* Terrain;
+	SunMesh* Sun;
+	SimpleMesh* Rocks;
+	Camera* Cmr;
+	Ctrl360* Joystick;
+	ShadowMapping* Shadows;
+	MotionBlurRender* MotionBlur;
+	Ocean* ocean;
 	CComPtr<ID3D11PixelShader> PShader, PSSunShader;
 	CComPtr<ID3D11VertexShader> VShader, VSSunShader;
 	CComPtr<ID3D11InputLayout> InputLayout, SunInputLayout;

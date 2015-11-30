@@ -593,9 +593,11 @@ HRESULT CompileShaderFromFile( WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR sz
 
     // find the file
     WCHAR str[MAX_PATH];
-
+	DWORD Sizepath = MAX_PATH;
+	DWORD val = GetModuleFileName(NULL, str, Sizepath);
+	PathRemoveFileSpec(str);
     // open the file
-    HANDLE hFile = CreateFile( str, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+    HANDLE hFile = CreateFile(lstrcat(str, szFileName), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
         FILE_FLAG_SEQUENTIAL_SCAN, NULL );
     if( INVALID_HANDLE_VALUE == hFile )
         return E_FAIL;

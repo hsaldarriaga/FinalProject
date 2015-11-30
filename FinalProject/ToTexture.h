@@ -28,15 +28,15 @@ private:
 	float Width, Height;
 
 	CComPtr<ID3D11InputLayout> InputLayout;
-	CComPtr<ID3D11DepthStencilState> ZBufferOff = NULL;
-	CComPtr<ID3D11SamplerState> sampler = NULL;
-	CComPtr<ID3D11Buffer> cbMatrix = NULL;
-	CComPtr<ID3D11Buffer> VertexBuffer = NULL, IndexBuffer = NULL;
-	CComPtr<ID3D11RenderTargetView> TextureRenderTargetView = NULL;
-	CComPtr<ID3D11ShaderResourceView> RenderShaderResource = NULL;
-	CComPtr<ID3D11Texture2D> TargetViewTexture2d = NULL, ShaderResourceTexture = NULL;
-	CComPtr<ID3D11VertexShader> VSShader = NULL;
-	CComPtr<ID3D11PixelShader> PSShader = NULL;
+	CComPtr<ID3D11DepthStencilState> ZBufferOff;
+	CComPtr<ID3D11SamplerState> sampler;
+	CComPtr<ID3D11Buffer> cbMatrix;
+	CComPtr<ID3D11Buffer> VertexBuffer, IndexBuffer;
+	CComPtr<ID3D11RenderTargetView> TextureRenderTargetView;
+	CComPtr<ID3D11ShaderResourceView> RenderShaderResource;
+	CComPtr<ID3D11Texture2D> TargetViewTexture2d, ShaderResourceTexture;
+	CComPtr<ID3D11VertexShader> VSShader;
+	CComPtr<ID3D11PixelShader> PSShader;
 	D3D11_VIEWPORT Viewport;
 	
 	float black[4];

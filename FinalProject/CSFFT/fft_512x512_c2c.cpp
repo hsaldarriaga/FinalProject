@@ -198,8 +198,8 @@ void fft512x512_create_plan(CSFFT512x512_Plan* plan, ID3D11Device* pd3dDevice, U
     ID3DBlob* pBlobCS = NULL;
     ID3DBlob* pBlobCS2 = NULL;
 
-    CompileShaderFromFile(L"CSFFT\\fft_512x512_c2c.hlsl", "Radix008A_CS", "cs_4_0", &pBlobCS);
-    CompileShaderFromFile(L"CSFFT\\fft_512x512_c2c.hlsl", "Radix008A_CS2", "cs_4_0", &pBlobCS2);
+    CompileShaderFromFile(L"\\shaders\\CSFFT\\fft_512x512_c2c.hlsl", "Radix008A_CS", "cs_4_0", &pBlobCS);
+    CompileShaderFromFile(L"\\shaders\\CSFFT\\fft_512x512_c2c.hlsl", "Radix008A_CS2", "cs_4_0", &pBlobCS2);
 	assert(pBlobCS);
 	assert(pBlobCS2);
 

@@ -4,13 +4,15 @@
 ImageFactory::ImageFactory(ID3D11Device* device)
 {
 	this->pDevice = device;
+	this->pFactory = NULL;
 }
-
+//El código de está clase fue tomado de https://msdn.microsoft.com/en-us/library/windows/desktop/ff476904(v=vs.85).aspx
 HRESULT ImageFactory::getImageFromFileName(const char* filename, ID3D11ShaderResourceView** view)
 {
 	IWICBitmapDecoder* pDecoder = NULL;
 	IWICBitmapFrameDecode* pFrame = NULL;
 	HRESULT hr = ERROR_SUCCESS;
+	//Se inicializa los objetos COM necesarios para leer una textura
 	if (!pFactory) 
 	{
 		hr = CoInitialize(NULL);
@@ -22,12 +24,16 @@ HRESULT ImageFactory::getImageFromFileName(const char* filename, ID3D11ShaderRes
 	{
 		size_t size = strlen(filename) + 1;
 		wchar_t* wa = new wchar_t[size];
+		//Convierte de char* a wchar_t*
 		mbstowcs_s(NULL, wa, size, filename, size);
+		//Se obtiene la imagén a partir de la ruta filename
 		hr = pFactory->CreateDecoderFromFilename(wa, NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pDecoder);
 		if (SUCCEEDED(hr))
 		{
+			//Se obtiene la imagen
 			hr = pDecoder->GetFrame(0, &pFrame);
 			if (SUCCEEDED(hr)) {
+				//Se crea la textura a partir de la imagen
 				hr = createTexture(pFrame, view);
 			}
 		}
@@ -53,7 +59,7 @@ HRESULT ImageFactory::createTexture(IWICBitmapFrameDecode* pFrame, ID3D11ShaderR
 	hr = pFrame->GetPixelFormat(&WICformat);
 	if (FAILED(hr))
 		return hr;
-	desc.Format = getDXGIFormat(WICformat);
+	desc.Format = getDXGIFormat(WICformat); // Se obtiene el formato equivalente de WIC a DXGI
 	UINT bpp = 0;
 	WICPixelFormatGUID convertGUID;
 	bool otherformat = false;
@@ -66,12 +72,12 @@ HRESULT ImageFactory::createTexture(IWICBitmapFrameDecode* pFrame, ID3D11ShaderR
 				memcpy(&convertGUID, &g_WICConvert[i].target, sizeof(WICPixelFormatGUID));
 
 				desc.Format = getDXGIFormat(g_WICConvert[i].target);
-				bpp = getbpp(pFactory, convertGUID);
+				bpp = getbpp(pFactory, convertGUID);//Bits Per Pixel
 				otherformat = true;
 				break;
 			}
 		}
-		if (desc.Format == DXGI_FORMAT_UNKNOWN)
+		if (desc.Format == DXGI_FORMAT_UNKNOWN) //Si no se encontró el formato en DXGI
 			return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
 	}
 	else {
@@ -80,9 +86,9 @@ HRESULT ImageFactory::createTexture(IWICBitmapFrameDecode* pFrame, ID3D11ShaderR
 	}
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
-	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE; //Indica que es una textura que leerá un sombreador
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.Usage = D3D11_USAGE_DYNAMIC;//La CPU puede modificar la textura
 	desc.MiscFlags = 0;
 	D3D11_SUBRESOURCE_DATA data;
 	ZeroMemory(&data, sizeof(data));
@@ -108,6 +114,7 @@ HRESULT ImageFactory::createTexture(IWICBitmapFrameDecode* pFrame, ID3D11ShaderR
 		if (FAILED(hr)){
 			FC->Release(); return hr;
 		}
+		//Se obtienen los pixeles de la imagen y se almacenan en imagedata
 		hr = FC->CopyPixels(0, data.SysMemPitch, data.SysMemSlicePitch, imagedata);
 		if (FAILED(hr)){
 			FC->Release(); return hr;
@@ -121,6 +128,7 @@ HRESULT ImageFactory::createTexture(IWICBitmapFrameDecode* pFrame, ID3D11ShaderR
 	if (FAILED(hr))
 		return hr;
 	data.pSysMem = imagedata;
+	//Una vez llenados todos los campos de Data, se crea la textura
 	hr = pDevice->CreateTexture2D(&desc, &data, &tex);
 	delete[] imagedata;
 	if (SUCCEEDED(hr)) 
@@ -129,7 +137,7 @@ HRESULT ImageFactory::createTexture(IWICBitmapFrameDecode* pFrame, ID3D11ShaderR
 		ZeroMemory(&viewdesc, sizeof(viewdesc));
 		viewdesc.Format = desc.Format;
 		viewdesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		viewdesc.Texture2D.MipLevels = 1;
+		viewdesc.Texture2D.MipLevels = 1; // luego se crea el Shader Resource View que es la interface para poder asignar la textura al sombreador
 		hr = pDevice->CreateShaderResourceView(tex, &viewdesc, view);
 	}
 	if (tex)

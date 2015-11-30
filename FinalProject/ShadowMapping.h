@@ -10,11 +10,11 @@ class ShadowMapping
 {
 	//Cascade Shadow Mapping With Percentage Closer filtering
 public:
-	ShadowMapping(Graphics*, DirectX::XMFLOAT2[], Camera* Cmr);
+	ShadowMapping(Graphics*, DirectX::XMFLOAT2[CASCADE_COUNT], Camera* Cmr);
 	bool Initialize();
 	void SetParameters(DirectX::XMFLOAT3 LightEye, DirectX::XMFLOAT3 LightTarget, DirectX::XMFLOAT3 LightUp);
-	void AddBufferToShowShadows(Camera* Cmr);
-	void Render(IMesh** Meshes, UINT count);
+	void AddBufferToShowShadows();
+	void Render(IMesh*const* Meshes, UINT count);
 	DirectX::XMVECTOR getLighDir();
 	DirectX::XMVECTOR getLighPos();
 	void* operator new(size_t i)
@@ -34,7 +34,7 @@ private:
 	bool CreateShadowShaders();
 	bool CreateShadowShaderBuffers();
 	Graphics* G;
-	UINT TextureSize = 2048;
+	UINT TextureSize;
 	DirectX::XMVECTOR LightEye, LightTarget, LightUp;
 
 	CComPtr<ID3D11DepthStencilView> shadowDepthStencilViews[CASCADE_COUNT];

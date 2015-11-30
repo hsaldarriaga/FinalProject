@@ -6,8 +6,11 @@ class MotionBlurRender
 public:
 	MotionBlurRender(Graphics*);
 	HRESULT Initialize(DirectX::XMVECTOR Kd);
+	//Esta función cambia el RenderTargetView para que todo lo que se renderize allí
+	//Se le aplique blur
 	void Prepare();
 	bool UpdateBuffers(Camera* Cmr);
+	//Aplica el efecto blur
 	void Render();
 #pragma region Allocator
 	void* operator new(size_t i)
@@ -26,10 +29,10 @@ private:
 	bool CreateBuffers(DirectX::XMVECTOR Kd);
 
 	Graphics* G;
-	ToTexture* ScreenSize = NULL, *ReduceSize = NULL, *RestoreSize = NULL;
+	ToTexture* ScreenSize, *ReduceSize, *RestoreSize;
 
 	CComPtr<ID3D11BlendState> BlendState;
-	CComPtr<ID3D11Buffer> VertexBuffer = NULL, IndexBuffer = NULL;
+	CComPtr<ID3D11Buffer> VertexBuffer, IndexBuffer;
 	CComPtr<ID3D11InputLayout> InputLayout;
 	CComPtr<ID3D11Buffer> cbMatrix, cbSize, cbColorToBlur;
 	CComPtr<ID3D11SamplerState> sampler;

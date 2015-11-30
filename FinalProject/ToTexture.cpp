@@ -7,6 +7,15 @@ ToTexture::ToTexture(Graphics* g)
 	this->G = g;
 	black[0] = black[1] = black[2] = 0;
 	black[3] = 1.0f;
+	ZBufferOff = NULL;
+	sampler = NULL;
+	cbMatrix = NULL;
+	VertexBuffer = NULL, IndexBuffer = NULL;
+	TextureRenderTargetView = NULL;
+	RenderShaderResource = NULL;
+	TargetViewTexture2d = NULL, ShaderResourceTexture = NULL;
+	VSShader = NULL;
+	PSShader = NULL;
 }
 
 HRESULT ToTexture::Initialize()
@@ -67,8 +76,8 @@ HRESULT ToTexture::InitializeRTVAndSRV()
 	texdesc.MipLevels = 1;
 	texdesc.ArraySize = 1;
 	texdesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	texdesc.SampleDesc.Count = 8;
-	texdesc.SampleDesc.Quality = 16;
+	texdesc.SampleDesc.Count = SAMPLE_COUNT;
+	texdesc.SampleDesc.Quality = QUALITY_LEVEL;
 	texdesc.Usage = D3D11_USAGE_DEFAULT;
 	texdesc.BindFlags = D3D11_BIND_RENDER_TARGET;
 	texdesc.CPUAccessFlags = 0;
@@ -100,11 +109,13 @@ HRESULT ToTexture::CreateVertexShaderBuffers()
 	ID3D11Device* g = G->pDevice;
 	BYTE* Data;
 	LONG Size;
-	if (FAILED(FileLoader::getDataAndSize(L"/shaders/SimpleVertexShader.cso", &Data, &Size)))
+	if (FAILED(FileLoader::getDataAndSize(L"/shaders/TextureVertexShader.cso", &Data, &Size)))
 		return E_FAIL;
-	D3D11_INPUT_ELEMENT_DESC desc[3];
-	desc[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
-	desc[1] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+	D3D11_INPUT_ELEMENT_DESC desc[] = 
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
 	if (FAILED(g->CreateInputLayout(desc, 2, Data, Size, &InputLayout.p))) {
 		delete[] Data;
 		return E_FAIL;
@@ -159,7 +170,7 @@ HRESULT ToTexture::CreatePixelShaderBuffers()
 	ID3D11Device* g = G->pDevice;
 	BYTE* Data;
 	LONG Size;
-	if (FAILED(FileLoader::getDataAndSize(L"/shaders/SimplePixelShader.cso", &Data, &Size)))
+	if (FAILED(FileLoader::getDataAndSize(L"/shaders/TexturePixelShader.cso", &Data, &Size)))
 		return E_FAIL;
 	if (FAILED(g->CreatePixelShader(Data, Size, NULL, &PSShader.p))) {
 		delete[] Data;
